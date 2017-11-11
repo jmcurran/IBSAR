@@ -1,7 +1,5 @@
-createEntry = function(progTbl, affilTbl, authorTbl, otherTbl, titleTbl, abstractTbl, row, path,
-                       isTalk = TRUE, tex = TRUE){
-
-  EOL = if(tex){"\\\\"}else{"\n\n"}
+createEntry = function(fileCon, progTbl, affilTbl, authorTbl, otherTbl, titleTbl, abstractTbl, row,
+                       isTalk = TRUE){
 
   if(isTalk){
     thisSubID = progTbl$subID[row]
@@ -12,11 +10,7 @@ createEntry = function(progTbl, affilTbl, authorTbl, otherTbl, titleTbl, abstrac
     time = progTbl$time[row]
 
     rooms = c("Narrabeen", "Gunnamatta", "Bundeena", "Mantra")
-    days = if(tex){
-      paste0(c("Monday", "Tuesday", "Wednesday", "Thursday"), " $", 27:30, "^\\mathrm{th}$")
-    }else{
-      paste0(c("Monday", "Tuesday", "Wednesday", "Thursday"), " ", 27:30, "<sup>th</sup>")
-    }
+    days = paste0(c("Monday", "Tuesday", "Wednesday", "Thursday"), " ", 27:30, "<sup>th</sup>")
 
     fmtTime = function(tm){
       hr = floor(tm / 100)
@@ -25,48 +19,17 @@ createEntry = function(progTbl, affilTbl, authorTbl, otherTbl, titleTbl, abstrac
       sprintf("%d:%s",hr, str_pad(as.character(mins), 2, "left", "0"))
     }
 
-    fileName = paste0(path,"/sub", programmeID, ifelse(tex, ".tex", ".Rmd"))
-    f1 = file(fileName, "w")
-
-    if(tex){
-      writeLines("\\noindent", f1)
-    }
-
     keynotes = c(88,91,92,93,94,12)
     morningKeynotes = c(88,91,92,94)
     keynote = FALSE
 
-    if(thisSubID %in% morningKeynotes){
-      if(tex){
-        writeLines("\\newpage", f1)
-        writeLines(sprintf("\\section*{Programme for %s November}", days[day]), f1)
-        writeLines(sprintf("\\addcontentsline{toc}{section}{Programme for %s November}", days[day]), f1)
-      }else{
-        writeLines("\\newpage", f1)
-        writeLines(sprintf("# Programme for %s November", days[day]), f1)
-      }
-    }
-
-    if(tex){
-      writeLines("\\noindent", f1)
-    }
-
     if(thisSubID %in% keynotes){
       keynote = TRUE
-
-      if(tex){
-        writeLines(sprintf("\\colorbox{red}{Keynote: %s %s %s~\\hfill}", days[day], fmtTime(time), rooms[4]), f1)
-      }else{
-        writeLines(sprintf("<span style=\"color:white;background-color=red\">Keynote: %s %s %s</span>", days[day], fmtTime(time), rooms[4]), f1)
-      }
+      writeLines(sprintf("<p style=\"color:white;background-color=red;text-align:center\">Keynote: %s %s %s</p>", days[day], fmtTime(time), rooms[4]), fileCon)
     }else{
-      if(tex){
-        writeLines(sprintf("\\colorbox{shadecolor}{%s %s %s~\\hfill}", days[day], fmtTime(time), rooms[stream]), f1)
-      }else{
-        writeLines(sprintf("<span style=\"background-color:#ccccff\">%s %s %s</span>", days[day], fmtTime(time), rooms[stream]), f1)
-      }
+      writeLines(sprintf("<p style=\"background-color:#ccccff;text-align:center\">%s %s %s</p>",
+                           days[day], fmtTime(time), rooms[stream]), fileCon)
     }
-
 
     theTitle = titleTbl %>% filter(subID == thisSubID)
 
@@ -74,12 +37,7 @@ createEntry = function(progTbl, affilTbl, authorTbl, otherTbl, titleTbl, abstrac
       theTitle$title = gsub("'S", "'s", theTitle$title)
     }
 
-    if(tex){
-      writeLines(sprintf("\\subsection*{%s}\n\\label{sub:%s}", theTitle$title,
-                         str_pad(as.character(thisSubID), 3, "left", "0")), f1)
-    }else{
-      writeLines(sprintf("## %s", theTitle$title), f1)
-    }
+    writeLines(sprintf("## %s", theTitle$title), fileCon)
 
     speaker = authorTbl %>% slice(authorID = progTbl$authorID[row])
 
@@ -100,35 +58,32 @@ createEntry = function(progTbl, affilTbl, authorTbl, otherTbl, titleTbl, abstrac
       paste(speakerAffiliation1$affiliation, "and", speakerAffiliation2$affiliation)
     }
 
-    tocEntry = if(keynote){
-      if(tex){
-        sprintf("\\addcontentsline{toc}{subsection}{%s \\textbf{Keynote}: %s, %s \\emph{%s}}",
-                fmtTime(time),
-                speaker$author,
-                affiliation,
-                theTitle$title)
-      }
-    }else{
-      if(tex){
-        sprintf("\\addcontentsline{toc}{subsection}{%s %s: %s, %s \\emph{%s}}",
-                fmtTime(time),
-                rooms[stream],
-                speaker$author,
-                affiliation,
-                theTitle$title)
-      }
-    }
+    # tocEntry = if(keynote){
+    #   if(tex){
+    #     sprintf("\\addcontentsline{toc}{subsection}{%s \\textbf{Keynote}: %s, %s \\emph{%s}}",
+    #             fmtTime(time),
+    #             speaker$author,
+    #             affiliation,
+    #             theTitle$title)
+    #   }
+    # }else{
+    #   if(tex){
+    #     sprintf("\\addcontentsline{toc}{subsection}{%s %s: %s, %s \\emph{%s}}",
+    #             fmtTime(time),
+    #             rooms[stream],
+    #             speaker$author,
+    #             affiliation,
+    #             theTitle$title)
+    #   }
+    # }
+    #
+    # if(tex){
+    #   writeLines(tocEntry, fileCon)
+    # }
 
-    if(tex){
-      writeLines(tocEntry, f1)
-    }
 
+    writeLines("<p style=\"text-align:center\">", fileCon)
 
-    if(tex){
-      writeLines("\\begin{center}", f1)
-    }else{
-      writeLines("<p style=\"text-align:center\">", f1)
-    }
     authors = otherTbl %>%
       filter(subID == thisSubID) %>%
       select(authorID)
@@ -167,70 +122,46 @@ createEntry = function(progTbl, affilTbl, authorTbl, otherTbl, titleTbl, abstrac
       }
       ms = apply(m, 1, afString)
 
-      if(tex){
-        sprintf("%s$^{\\mathrm{%s}}$", authorDetails$author, ms)
-      }else{
-        sprintf("%s<sup>%s</sup>", authorDetails$author, ms)
-      }
+      sprintf("%s<sup>%s</sup>", authorDetails$author, ms)
     }
 
 
     authorLine  = if(numAuthors == 1){
-      paste0(s, EOL)
+      paste0(s, "</br>")
     }else if(numAuthors == 2){
-      paste0(paste(s, collapse = " and "), EOL)
+      paste0(paste(s, collapse = " and "), "</br>")
     }else{
-      paste0(paste0(s[-numAuthors], collapse = ", "), ", and ", s[numAuthors], EOL, sep="")
+      paste0(paste0(s[-numAuthors], collapse = ", "), ", and ", s[numAuthors], "</br>", sep="")
     }
 
-    writeLines(authorLine, f1)
+    writeLines(authorLine, fileCon)
 
     affilLine = if(numAffiliations == 1){
-      paste0(sprintf("%s%s", affiliations$affiliation, EOL))
+      paste0(affiliations$affiliation, "</br>")
     }else{
-      paste0(sprintf("$^{%d}$ %s%s", 1:numAffiliations, affiliations$affiliation, EOL))
+      paste0(sprintf("<sup>%d</sup>%s</br>", 1:numAffiliations, affiliations$affiliation))
     }
-    writeLines(affilLine, f1)
-    if(tex){
-      writeLines("\\end{center}", f1)
-    }else{
-      writeLines("</p>", f1)
-    }
+    writeLines(affilLine, fileCon)
+    writeLines("</p>", fileCon)
 
     abstract = abstractTbl %>% filter(subID == thisSubID)
 
-    if(tex){
-      abstractLine = gsub("&","\\\\&", abstract$abstract)
-      abstractLine = gsub("%","\\\\%", abstractLine)
-      abstractLine = gsub("~","\\\\~", abstractLine)
-      writeLines(abstractLine, f1)
-    }else{
-      writeLines(abstract$abstract, f1)
-    }
-    writeLines("\\newpage", f1)
-    close(f1)
+    # if(tex){
+    #   abstractLine = gsub("&","\\\\&", abstract$abstract)
+    #   abstractLine = gsub("%","\\\\%", abstractLine)
+    #   abstractLine = gsub("~","\\\\~", abstractLine)
+    #   writeLines(abstractLine, fileCon)
+    # }else{
+    writeLines(abstract$abstract, fileCon)
   }else{ #it's a poster
     thisSubID = progTbl$subID[row]
-
-    fileName = paste0(path,"/poster", row, ifelse(tex, ".tex", ".Rmd"))
-    f1 = file(fileName, "w")
-
-    if(tex){
-      writeLines("\\noindent", f1)
-    }
-
     theTitle = titleTbl %>% filter(subID == thisSubID)
 
     if(grepl("Alzheimer'S", theTitle$title)){
       theTitle$title = gsub("'S", "'s", theTitle$title)
     }
 
-    if(tex){
-      writeLines(sprintf("\\subsection*{%s}\n\\label{sub:%s}", theTitle$title,
-                         str_pad(as.character(thisSubID), 3, "left", "0")), f1)
-    }else{
-      writeLines(sprintf("## %s", theTitle$title), f1)
-    }
+    writeLines(sprintf("## %s", theTitle$title), fileCon)
 
     speaker = authorTbl %>% slice(authorID = progTbl$authorID[row])
     speakerAffiliation1 = affilTbl %>% slice(affilID = speaker$affilID1)
@@ -246,21 +177,7 @@ createEntry = function(progTbl, affilTbl, authorTbl, otherTbl, titleTbl, abstrac
       paste(speakerAffiliation1$affiliation, "and", speakerAffiliation2$affiliation)
     }
 
-    tocEntry = sprintf("\\addcontentsline{toc}{subsection}{%s, %s \\emph{%s}}",
-                          speaker$author,
-                          affiliation,
-                          theTitle$title)
-
-    if(tex){
-      writeLines(tocEntry, f1)
-    }
-
-
-    if(tex){
-      writeLines("\\begin{center}", f1)
-    }else{
-      writeLines("<p style=\"text-align:center\">", f1)
-    }
+    writeLines("<p style=\"text-align:center\">", fileCon)
 
     authors = otherTbl %>%
       filter(subID == thisSubID) %>%
@@ -300,52 +217,28 @@ createEntry = function(progTbl, affilTbl, authorTbl, otherTbl, titleTbl, abstrac
       }
       ms = apply(m, 1, afString)
 
-      if(tex){
-        sprintf("%s$^{\\mathrm{%s}}$", authorDetails$author, ms)
-      }else{
-        sprintf("%s<sup>%s</sup>$", authorDetails$author, ms)
-      }
+      sprintf("%s<sup>%s</sup>$", authorDetails$author, ms)
     }
 
     authorLine  = if(numAuthors == 1){
-      paste0(s, EOL)
+      paste0(s, "</br>")
     }else if(numAuthors == 2){
-      paste0(paste(s, collapse = " and "), EOL)
+      paste0(paste(s, collapse = " and "), "</br>")
     }else{
-      paste0(paste0(s[-numAuthors], collapse = ", "), ", and ", s[numAuthors], EOL, sep="")
+      paste0(paste0(s[-numAuthors], collapse = ", "), ", and ", s[numAuthors], "</br>", sep="")
     }
 
-    writeLines(authorLine, f1)
+    writeLines(authorLine, fileCon)
 
     affilLine = if(numAffiliations == 1){
-      paste0(sprintf("%s%s", affiliations$affiliation, EOL))
+      paste0(sprintf("%s%s", affiliations$affiliation, "</br>"))
     }else{
-      if(tex){
-        paste0(sprintf("$^{%d}$ %s%s", 1:numAffiliations, affiliations$affiliation, EOL))
-      }else{
-        paste0(sprintf("<sup>%d</sup> %s%s", 1:numAffiliations, affiliations$affiliation, EOL))
-      }
+        paste0(sprintf("<sup>%d</sup> %s%s", 1:numAffiliations, affiliations$affiliation, "</br>"))
     }
-    writeLines(affilLine, f1)
-    if(tex){
-      writeLines("\\end{center}", f1)
-    }else{
-      writeLines("</p>", f1)
-    }
+    writeLines(affilLine, fileCon)
+    writeLines("</p>", fileCon)
 
     abstract = abstractTbl %>% filter(subID == thisSubID)
-
-    if(tex){
-      abstractLine = gsub("&","\\\\&", abstract$abstract)
-      abstractLine = gsub("%","\\\\%", abstractLine)
-      abstractLine = gsub("%","\\\\~", abstractLine)
-      writeLines(abstractLine, f1)
-    }else{
-      writeLines(abstract$abstract, f1)
-    }
-
-    writeLines("\\newpage", f1)
-
-    close(f1)
+    writeLines(abstract$abstract, fileCon)
   }
 }
