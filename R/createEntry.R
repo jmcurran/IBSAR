@@ -25,7 +25,7 @@ createEntry = function(fileCon, progTbl, affilTbl, authorTbl, otherTbl, titleTbl
 
     if(thisSubID %in% keynotes){
       keynote = TRUE
-      writeLines(sprintf("<p style=\"color:white;background-color=red;text-align:center\">Keynote: %s %s %s</p>", days[day], fmtTime(time), rooms[4]), fileCon)
+      writeLines(sprintf("<p style=\"color:white;background-color:red;text-align:center\">Keynote: %s %s %s</p>", days[day], fmtTime(time), rooms[4]), fileCon)
     }else{
       writeLines(sprintf("<p style=\"background-color:#ccccff;text-align:center\">%s %s %s</p>",
                            days[day], fmtTime(time), rooms[stream]), fileCon)
@@ -217,7 +217,7 @@ createEntry = function(fileCon, progTbl, affilTbl, authorTbl, otherTbl, titleTbl
       }
       ms = apply(m, 1, afString)
 
-      sprintf("%s<sup>%s</sup>$", authorDetails$author, ms)
+      sprintf("%s<sup>%s</sup>", authorDetails$author, ms)
     }
 
     authorLine  = if(numAuthors == 1){
@@ -240,5 +240,6 @@ createEntry = function(fileCon, progTbl, affilTbl, authorTbl, otherTbl, titleTbl
 
     abstract = abstractTbl %>% filter(subID == thisSubID)
     writeLines(abstract$abstract, fileCon)
+    writeLines("<p></p>", fileCon)
   }
 }
