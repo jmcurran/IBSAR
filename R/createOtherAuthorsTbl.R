@@ -3,11 +3,15 @@ createOtherAuthorsTbl = function(ss, create = FALSE){
   authorTbl = ss %>% gs_read(ws = "authorTbl")
   correspTbl = ss %>% gs_read(ws = "correspTbl")
 
+  allSheet = allSheet %>% add_column(allID = 1:nrow(allSheet), .before = 1)
+
   otherTbl = authorTbl %>%
     left_join(allSheet, by = c("author" = "Author")) %>%
-    select(authorID,Submission) %>%
-    rename(subID = Submission) %>%
-    filter(!is.na(subID))
+    select(allID, authorID, Submission) %>%
+    rename(otherID = allID, subID = Submission) %>%
+    filter(!is.na(subID)) %>%
+    arrange(otherID)
+
 
   ss = if(create){
     ss %>% gs_ws_new(ws_title = "otherTbl", input = otherTbl, row_extent = 2)

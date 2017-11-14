@@ -1,6 +1,5 @@
 createEntry = function(fileCon, progTbl, affilTbl, authorTbl, otherTbl, titleTbl, abstractTbl, row,
                        isTalk = TRUE){
-
   if(isTalk){
     thisSubID = progTbl$subID[row]
 
@@ -37,7 +36,7 @@ createEntry = function(fileCon, progTbl, affilTbl, authorTbl, otherTbl, titleTbl
       theTitle$title = gsub("'S", "'s", theTitle$title)
     }
 
-    writeLines(sprintf("## %s", theTitle$title), fileCon)
+    writeLines(sprintf("## %s {-}", theTitle$title), fileCon)
 
     speaker = authorTbl %>% slice(authorID = progTbl$authorID[row])
 
@@ -86,7 +85,8 @@ createEntry = function(fileCon, progTbl, affilTbl, authorTbl, otherTbl, titleTbl
 
     authors = otherTbl %>%
       filter(subID == thisSubID) %>%
-      select(authorID)
+      select(otherID, authorID) %>%
+      arrange(otherID)
 
     authorDetails = authorTbl %>% right_join(authors, by = "authorID")
 
@@ -117,29 +117,29 @@ createEntry = function(fileCon, progTbl, affilTbl, authorTbl, otherTbl, titleTbl
         if(!is.na(x[1]) && is.na(x[2])){
           sprintf("%d",x[1])
         }else{
-          sprintf("%d",x[1],x[2])
+          sprintf("%d,%d",x[1],x[2])
         }
       }
       ms = apply(m, 1, afString)
 
-      sprintf("%s<sup>%s</sup>", authorDetails$author, ms)
+      sprintf("%s^%s^", authorDetails$author, ms)
     }
 
 
     authorLine  = if(numAuthors == 1){
-      paste0(s, "</br>")
+      paste0(s, "<br />")
     }else if(numAuthors == 2){
-      paste0(paste(s, collapse = " and "), "</br>")
+      paste0(paste(s, collapse = " and "), "<br />")
     }else{
-      paste0(paste0(s[-numAuthors], collapse = ", "), ", and ", s[numAuthors], "</br>", sep="")
+      paste0(paste0(s[-numAuthors], collapse = ", "), ", and ", s[numAuthors], "<br />", sep="")
     }
 
     writeLines(authorLine, fileCon)
 
     affilLine = if(numAffiliations == 1){
-      paste0(affiliations$affiliation, "</br>")
+      paste0(affiliations$affiliation, "<br />")
     }else{
-      paste0(sprintf("<sup>%d</sup>%s</br>", 1:numAffiliations, affiliations$affiliation))
+      paste0(sprintf("^%d^%s<br />", 1:numAffiliations, affiliations$affiliation))
     }
     writeLines(affilLine, fileCon)
     writeLines("</p>", fileCon)
@@ -153,15 +153,20 @@ createEntry = function(fileCon, progTbl, affilTbl, authorTbl, otherTbl, titleTbl
     #   writeLines(abstractLine, fileCon)
     # }else{
     writeLines(abstract$abstract, fileCon)
+    writeLines("<p class=\"pagebreak\"></p>", con = fileCon)
+
   }else{ #it's a poster
     thisSubID = progTbl$subID[row]
+
+    #if(thisSubID == 90) browser()
+
     theTitle = titleTbl %>% filter(subID == thisSubID)
 
     if(grepl("Alzheimer'S", theTitle$title)){
       theTitle$title = gsub("'S", "'s", theTitle$title)
     }
 
-    writeLines(sprintf("## %s", theTitle$title), fileCon)
+    writeLines(sprintf("## %s {-}", theTitle$title), fileCon)
 
     speaker = authorTbl %>% slice(authorID = progTbl$authorID[row])
     speakerAffiliation1 = affilTbl %>% slice(affilID = speaker$affilID1)
@@ -181,7 +186,8 @@ createEntry = function(fileCon, progTbl, affilTbl, authorTbl, otherTbl, titleTbl
 
     authors = otherTbl %>%
       filter(subID == thisSubID) %>%
-      select(authorID)
+      select(otherID, authorID) %>%
+      arrange(otherID)
 
     authorDetails = authorTbl %>% right_join(authors, by = "authorID")
 
@@ -212,34 +218,34 @@ createEntry = function(fileCon, progTbl, affilTbl, authorTbl, otherTbl, titleTbl
         if(!is.na(x[1]) && is.na(x[2])){
           sprintf("%d",x[1])
         }else{
-          sprintf("%d",x[1],x[2])
+          sprintf("%d,%d",x[1],x[2])
         }
       }
       ms = apply(m, 1, afString)
 
-      sprintf("%s<sup>%s</sup>", authorDetails$author, ms)
+      sprintf("%s^%s^", authorDetails$author, ms)
     }
 
     authorLine  = if(numAuthors == 1){
-      paste0(s, "</br>")
+      paste0(s, "<br />")
     }else if(numAuthors == 2){
-      paste0(paste(s, collapse = " and "), "</br>")
+      paste0(paste(s, collapse = " and "), "<br />")
     }else{
-      paste0(paste0(s[-numAuthors], collapse = ", "), ", and ", s[numAuthors], "</br>", sep="")
+      paste0(paste0(s[-numAuthors], collapse = ", "), ", and ", s[numAuthors], "<br />", sep="")
     }
 
     writeLines(authorLine, fileCon)
 
     affilLine = if(numAffiliations == 1){
-      paste0(sprintf("%s%s", affiliations$affiliation, "</br>"))
+      paste0(sprintf("%s%s", affiliations$affiliation, "<br />"))
     }else{
-        paste0(sprintf("<sup>%d</sup> %s%s", 1:numAffiliations, affiliations$affiliation, "</br>"))
+        paste0(sprintf("^%d^%s%s", 1:numAffiliations, affiliations$affiliation, "<br />"))
     }
     writeLines(affilLine, fileCon)
     writeLines("</p>", fileCon)
 
     abstract = abstractTbl %>% filter(subID == thisSubID)
-    writeLines(abstract$abstract, fileCon)
-    writeLines("<p></p>", fileCon)
+    writeLines(abstract$abstract, con = fileCon)
+    writeLines("<p class=\"pagebreak\"></p>", con = fileCon)
   }
 }

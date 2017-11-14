@@ -1,4 +1,4 @@
-writeProg = function(path = "~/Dropbox/Work/2017/Conferences/IBS-AR/"){
+writeProg = function(path = "~/Dropbox/Work/2017/Conferences/IBS-AR/IBSAR-Prog/"){
   # templateLines = if(tex){
   #   readLines(system.file("tex", "programme.tex", package = "IBSAR"))
   # }else{
@@ -22,7 +22,7 @@ writeProg = function(path = "~/Dropbox/Work/2017/Conferences/IBS-AR/"){
   Sys.sleep(10)
   abstractTbl = programme %>% gs_read(ws = "abstractTbl")
 
-  daysOfWeek = paste0(c("Mon", "Tues", "Wed", "Thurs"), "day")
+  daysOfWeek = paste0(c("Mon", "Tues", "Wednes", "Thurs"), "day")
 
   for(d in 1:4){
     dayProgTbl = progTbl %>% filter(day == d)
@@ -30,9 +30,9 @@ writeProg = function(path = "~/Dropbox/Work/2017/Conferences/IBS-AR/"){
     fileName = paste0(path, str_pad(as.character(d), 2, "left", "0"), "-", daysOfWeek[d], ".Rmd")
     f1 = file(fileName, "w")
 
-    writeLines(paste0("# Programme And Abstracts for ",
+    writeLines(paste0("# Programme And Abstracts For ",
                       daysOfWeek[d]," ",
-                      (27:30)[d], "<sup>th</sup> of November"),
+                      (27:30)[d], "^th^ Of November {-}"),
                f1)
 
     for(row in 1:nrow(dayProgTbl)){
@@ -47,7 +47,7 @@ writeProg = function(path = "~/Dropbox/Work/2017/Conferences/IBS-AR/"){
 
   fileName = paste0(path, "05-Posters.Rmd")
   f1 = file(fileName, "w")
-  writeLines("# Poster Abstracts", f1)
+  writeLines("# Poster Abstracts {-}", f1)
 
 
   posterTbl = programme %>% gs_read(ws = "posterTbl")
@@ -56,4 +56,6 @@ writeProg = function(path = "~/Dropbox/Work/2017/Conferences/IBS-AR/"){
     createEntry(f1, posterTbl, affilTbl, authorTbl, otherTbl, titleTbl,
                 abstractTbl, row, isTalk = FALSE)
   }
+
+  close(f1)
 }
