@@ -22,8 +22,8 @@ writeTT = function(path = "~/Dropbox/Work/2017/Conferences/IBS-AR/IBSAR-Prog/"){
       filter(!is.na(time))
 
     tbl = c(tbl, "\t\t<tr>")
-    tbl = c(tbl, "\t\t\t<td class = \"time\">Time</td>")
-    tbl = c(tbl, sprintf("\t\t\t<td class = \"day\" colspan = \"%d\">%s</td>", numStreams, dayOfWeek$title))
+    tbl = c(tbl, "\t\t\t<th class = \"time\">Time</th>")
+    tbl = c(tbl, sprintf("\t\t\t<th class = \"day\" colspan = \"%d\">%s</th>", numStreams, dayOfWeek$title))
     tbl = c(tbl, "\t\t</tr>")
     tbl = c(tbl, "\t</thead>")
 
