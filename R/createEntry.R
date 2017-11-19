@@ -24,7 +24,7 @@ createEntry = function(fileCon, progTbl, affilTbl, authorTbl, otherTbl, titleTbl
 
     if(thisSubID %in% keynotes){
       keynote = TRUE
-      writeLines(sprintf("<p style=\"color:white;background-color:red;text-align:center\">Keynote: %s %s %s</p>", days[day], fmtTime(time), rooms[4]), fileCon)
+      writeLines(sprintf("<p style=\"color:white;background-color:#ed2d2d;text-align:center\">Keynote: %s %s %s</p>", days[day], fmtTime(time), rooms[4]), fileCon)
     }else{
       writeLines(sprintf("<p style=\"background-color:#ccccff;text-align:center\">%s %s %s</p>",
                            days[day], fmtTime(time), rooms[stream]), fileCon)
