@@ -12,7 +12,7 @@ writeTT = function(path = "~/Dropbox/Work/2017/Conferences/IBS-AR/IBSAR-Prog/"){
     numStreams = max(dayProgTbl$stream, na.rm = TRUE)
 
     tbl = "<table>"
-    tbl = c(tbl, "\t<thead>")
+    tbl = c(tbl, "<thead>")
 
     dayOfWeek = dayProgTbl %>%
       filter(is.na(time)) %>%
@@ -21,13 +21,13 @@ writeTT = function(path = "~/Dropbox/Work/2017/Conferences/IBS-AR/IBSAR-Prog/"){
     dayProgTbl = dayProgTbl %>%
       filter(!is.na(time))
 
-    tbl = c(tbl, "\t\t<tr>")
-    tbl = c(tbl, "\t\t\t<th class = \"time\">Time</th>")
-    tbl = c(tbl, sprintf("\t\t\t<th class = \"day\" colspan = \"%d\">%s</th>", numStreams, dayOfWeek$title))
-    tbl = c(tbl, "\t\t</tr>")
-    tbl = c(tbl, "\t</thead>")
+    tbl = c(tbl, "<tr>")
+    tbl = c(tbl, "<th class = \"time\">Time</th>")
+    tbl = c(tbl, sprintf("<th class = \"day\" colspan = \"%d\">%s</th>", numStreams, dayOfWeek$title))
+    tbl = c(tbl, "</tr>")
+    tbl = c(tbl, "</thead>")
 
-    tbl = c(tbl, "\t<tbody>")
+    tbl = c(tbl, "<tbody>")
 
     times = dayProgTbl %>%
       distinct(time) %>%
@@ -39,21 +39,21 @@ writeTT = function(path = "~/Dropbox/Work/2017/Conferences/IBS-AR/IBSAR-Prog/"){
       # browser()
 
       if(nRows == 1){ ## usually housekeeping, keynote, mealbreak, poster, close
-        tblRow = "\t\t<tr>"
+        tblRow = "<tr>"
 
         if(rowData$type %in% c("close","housekeeping", "keynote", "mealbreak", "poster", "welcome")){
-          timeStr = sprintf("\t\t\t<td class = \"time\">%d</td>", rowData$time)
+          timeStr = sprintf("<td class = \"time\">%d</td>", rowData$time)
           tblRow = c(tblRow, timeStr)
 
           rowData = rowData %>%
             mutate(rawEntry = gsub("\n", "<br/>", rawEntry))
 
-          rowStr = sprintf("\t\t\t<td class = \"%s\" colspan = \"%d\">%s</td>",
+          rowStr = sprintf("<td class = \"%s\" colspan = \"%d\">%s</td>",
                            rowData$type,
                            numStreams,
                            rowData$rawEntry)
           tblRow = c(tblRow, rowStr)
-          tblRow = c(tblRow, "\t\t</tr>")
+          tblRow = c(tblRow, "</tr>")
         }else{
           browser()
         }
@@ -65,30 +65,30 @@ writeTT = function(path = "~/Dropbox/Work/2017/Conferences/IBS-AR/IBSAR-Prog/"){
           arrange(stream)
 
         if(nrow(sessionHeaders) > 0){
-          tblRow = "\t\t<tr>"
-          tblRow = c(tblRow, "\t\t\t<td class = \"time\"></td>")
+          tblRow = "<tr>"
+          tblRow = c(tblRow, "<td class = \"time\"></td>")
 
-          sessionStr = sprintf("\t\t\t<td class = \"sessionheader\">%s</td>", sessionHeaders$title)
+          sessionStr = sprintf("<td class = \"sessionheader\">%s</td>", sessionHeaders$title)
           tblRow = c(tblRow, sessionStr)
-          tblRow = c(tblRow, "\t\t</tr>")
+          tblRow = c(tblRow, "</tr>")
         }
 
         if(is.null(tblRow)){
-          tblRow = "\t\t<tr>"
+          tblRow = "<tr>"
         }else{
-          tblRow = c(tblRow, "\t\t<tr>")
+          tblRow = c(tblRow, "<tr>")
         }
 
-        timeStr = sprintf("\t\t\t<td class = \"time\">%d</td>", rowData$time[1])
+        timeStr = sprintf("<td class = \"time\">%d</td>", rowData$time[1])
         tblRow = c(tblRow, timeStr)
 
         talks = rowData %>%
           filter(type == "contributed") %>%
           arrange(stream) %>%
           mutate(rawEntry = gsub("\n", "<br/>", rawEntry))
-        talkStr = sprintf("\t\t\t<td class = \"contributed\">%s</td>", talks$rawEntry)
+        talkStr = sprintf("<td class = \"contributed\">%s</td>", talks$rawEntry)
         tblRow = c(tblRow, talkStr)
-        tblRow = c(tblRow, "\t\t</tr>")
+        tblRow = c(tblRow, "</tr>")
       }else{
         browser()
       }
@@ -103,7 +103,7 @@ writeTT = function(path = "~/Dropbox/Work/2017/Conferences/IBS-AR/IBSAR-Prog/"){
 
     # browser()
 
-    tbl = c(tbl, "\t</tbody>")
+    tbl = c(tbl, "</tbody>")
     tbl = c(tbl, "</table>")
 
   }
