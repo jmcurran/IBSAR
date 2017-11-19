@@ -2,7 +2,7 @@ createProgTbl = function(ss, create = FALSE, delete = FALSE){
 
   ### Try and match the current programme to talks
   buildTbl = function(){
-    mainProg = gs_read(ss, ws = "Programme", range = "A3:M24", col_names = LETTERS[1:13])
+    mainProg = gs_read(ss, ws = "Programme", range = "A1:M24", col_names = LETTERS[1:13])
 
     Days = list(mainProg$A, mainProg$D, mainProg$G, mainProg$K)
 
@@ -20,7 +20,7 @@ createProgTbl = function(ss, create = FALSE, delete = FALSE){
     i = 1
     programmeID = 1
     progTbl = data_frame(programmeID = integer(), day = integer(), stream = integer(),
-                         time = integer(), rawEntry = character())
+                         time = integer(), rawEntry = character(), type = character())
 
     for(session in Sessions){
       day = Daysession[i]
@@ -28,7 +28,8 @@ createProgTbl = function(ss, create = FALSE, delete = FALSE){
       times = Days[[day]]
 
       for(j in 1:length(session)){
-        if(!is.na(times[j]) & !is.na(session[j]) & !grepl("^(Morning|Lunch|Afternoon).*$", session[j])){
+        if(!is.na(session[j])){
+
           progTbl = progTbl %>% add_row(programmeID = as.integer(programmeID),
                                         day = as.integer(day),
                                         stream = as.integer(stream),
@@ -65,12 +66,39 @@ createProgTbl = function(ss, create = FALSE, delete = FALSE){
   titleTbl = gs_read(ss, ws = "titleTbl")
   progTbl = progTbl %>% left_join(titleTbl, by = "title")
 
+  getType = function(col){
+    keynotes = "(Elisabetta|Jean|Rachel|Dianne|Sonja|Louise Ryan)"
+    meals =  "(Morning|Lunch|Afternoon)"
+    posters = "Lightning"
+    welcome = "Welcome"
+    confClose = "^.*Conference Close.*$"
+    housekeeping = "Housekeeping"
+    conferenceDay = "(Mon|Tues|Wednes|Thurs)day"
+
+    type = rep("", length(col))
+
+    type[grep(housekeeping, col)] = "housekeeping"
+    type[grep(conferenceDay, col)] = "day"
+    type[grep(meals, col)] = "mealbreak"
+    type[grep(posters, col)] = "poster"
+    type[grep(welcome, col)] = "welcome"
+    type[grepl(keynotes, col) & !grepl(confClose, col)] = "keynote"
+    type[grepl(confClose, col)] = "close"
+    type[grepl("^$", type)] = "contributed"
+
+    return(type)
+  }
+
+  progTbl = progTbl %>%
+    mutate(type = getType(rawEntry)) %>%
+    mutate(type = replace(type, is.na(time) & type != "day", "sessionheader"))
+
 
   if(delete){
-    ss = ss %>% gs_ws_delete(ws = "progTbl") %>% gs_ws_new(ws_title = "progTbl", input = progTbl, trim = TRUE, row_extent = 7)
+    ss = ss %>% gs_ws_delete(ws = "progTbl") %>% gs_ws_new(ws_title = "progTbl", input = progTbl, trim = TRUE, row_extent = 10)
   }else{
     ss = if(create){
-      ss %>% gs_ws_new(ws_title = "progTbl", input = progTbl, trim = TRUE, row_extent = 7)
+      ss %>% gs_ws_new(ws_title = "progTbl", input = progTbl, trim = TRUE, row_extent = 10)
     }else{
       ss %>% gs_edit_cells(ws = "progTbl", input = progTbl, anchor = "A1", trim = TRUE)
     }
