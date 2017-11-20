@@ -9,5 +9,9 @@ createAffilTbl = function(ss, create = FALSE){
     ss %>% gs_edit_cells(ws = "affilTbl", input = affilTbl, anchor = "A1", trim = TRUE)
   }
 
+  db = dbConnect(RSQLite::SQLite(), "ibsar")
+  dbWriteTable(db, "affilTbl", affilTbl)
+  dbDisconnect(db)
+
   return(ss)
 }

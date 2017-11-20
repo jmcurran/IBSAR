@@ -19,5 +19,9 @@ createOtherAuthorsTbl = function(ss, create = FALSE){
     ss %>% gs_edit_cells(ws = "otherTbl", input = otherTbl, anchor = "A1", trim = TRUE)
   }
 
+  db = dbConnect(RSQLite::SQLite(), "ibsar")
+  dbWriteTable(db, "othersTbl", othersTbl)
+  dbDisconnect(db)
+
   return(ss)
 }

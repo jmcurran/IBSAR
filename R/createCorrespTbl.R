@@ -14,5 +14,9 @@ createCorrespondingTbl = function(ss, create = FALSE){
     ss %>% gs_edit_cells(ws = "correspTbl", input = correspTbl, anchor = "A1", trim = TRUE)
   }
 
+  db = dbConnect(RSQLite::SQLite(), "ibsar")
+  dbWriteTable(db, "correspTbl", correspTbl)
+  dbDisconnect(db)
+
   return(ss)
 }

@@ -36,5 +36,9 @@ createAuthorTbl = function(ss, create = FALSE){
     ss = ss %>% gs_edit_cells(ws = "authorTbl", input = authorTbl, anchor = "A1", trim = TRUE)
   }
 
+  db = dbConnect(RSQLite::SQLite(), "ibsar")
+  dbWriteTable(db, "authorTbl", authorTbl)
+  dbDisconnect(db)
+
   return(ss)
 }

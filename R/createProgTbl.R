@@ -104,5 +104,9 @@ createProgTbl = function(ss, create = FALSE, delete = FALSE){
     }
   }
 
+  db = dbConnect(RSQLite::SQLite(), "ibsar")
+  dbWriteTable(db, "progTbl", progTbl)
+  dbDisconnect(db)
+
   return(ss)
 }
