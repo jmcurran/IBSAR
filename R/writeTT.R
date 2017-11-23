@@ -55,7 +55,18 @@ writeTT = function(path = "~/Dropbox/Work/2017/Conferences/IBS-AR/IBSAR-Prog/"){
           tblRow = c(tblRow, rowStr)
           tblRow = c(tblRow, "</tr>")
         }else{
-          browser()
+          ## This only happens in one place day 1, 12 pm stream 1 is emptpy
+          timeStr = sprintf("<td class = \"time\">%d</td>", rowData$time)
+          tblRow = c(tblRow, timeStr)
+
+          rowData = rowData %>%
+            mutate(rawEntry = gsub("\n", "<br/>", rawEntry))
+
+          rowStr = sprintf("<td class = \"contributed\"></td>\n<td class = \"%s\">%s</td>",
+                           rowData$type,
+                           rowData$rawEntry)
+          tblRow = c(tblRow, rowStr)
+          tblRow = c(tblRow, "</tr>")
         }
       }else if(nRows >=2){ ##  2-3 talks or 2-3 session headers and 2-3 talks
         tblRow = NULL

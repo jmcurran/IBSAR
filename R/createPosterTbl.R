@@ -16,9 +16,9 @@ createPosterTbl = function(ss, create = FALSE){
     ss %>% gs_edit_cells(ws = "posterTbl", input = posterTbl, anchor = "A1", trim = TRUE)
   }
 
-  db = dbConnect(RSQLite::SQLite(), "ibsar")
-  dbWriteTable(db, "posterTbl", posterTbl)
-  dbDisconnect(db)
+  # db = dbConnect(RSQLite::SQLite(), "ibsar")
+  # dbWriteTable(db, "posterTbl", posterTbl)
+  # dbDisconnect(db)
 
   return(ss)
 }

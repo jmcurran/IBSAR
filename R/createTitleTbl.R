@@ -25,9 +25,9 @@ createTitleTbl = function(ss, create = FALSE){
     ss %>% gs_edit_cells(ws = "titleTbl", input = titleTbl, anchor = "A1", trim = TRUE)
   }
 
-  db = dbConnect(RSQLite::SQLite(), "ibsar")
-  dbWriteTable(db, "titleTbl", titleTbl)
-  dbDisconnect(db)
+  # db = dbConnect(RSQLite::SQLite(), "ibsar")
+  # dbWriteTable(db, "titleTbl", titleTbl)
+  # dbDisconnect(db)
 
   return(ss)
 }

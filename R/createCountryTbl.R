@@ -9,9 +9,9 @@ createCountryTbl = function(ss, create = FALSE){
     ss %>% gs_edit_cells(ws = "countryTbl", input = countryTbl, anchor = "A1", trim = TRUE)
   }
 
-  db = dbConnect(RSQLite::SQLite(), "ibsar")
-  dbWriteTable(db, "countryTbl", countryTbl)
-  dbDisconnect(db)
+  # db = dbConnect(RSQLite::SQLite(), "ibsar")
+  # dbWriteTable(db, "countryTbl", countryTbl)
+  # dbDisconnect(db)
 
   return(ss)
 }
